@@ -13,8 +13,6 @@ This code was hacked in a day to help locate fonts.  It’s made of 2 separate t
  - A minimal library to find out fonts that fully cover a test string.
  - A minimal QT app to do that interactively, with font samples.
 
-In the app, click a font name to copy it to clipboard.
-
 # Install
 
 ```fish
@@ -30,6 +28,24 @@ cd glyph-finder; sudo python3 setup.py install
 ```
 
 (This is the only working fontconfig binding I could find.  The ones in pip including Python_fontconfig don't install, and the setuptools function to automatically fetch a git repo is getting some sort of cache which doesn't work.  Python!)
+
+# Usage
+
+Command: `glyph-viewer [your-query-string]` .    
+
+You can experiment with the query in the UI.  Press Enter to search fonts again.  Click a font name to copy it to clipboard.
+
+Library usage:
+
+```python
+
+has_glyphs("/path/to/myfont.ttf", "ąǚæſ")
+# True if the font has glyphs for all the characters in query string.
+
+font_families = families_with_glyphs_for(""ąǚæſ")
+# list of strings describing font families
+
+```
 
 # Acknowledgements
 
