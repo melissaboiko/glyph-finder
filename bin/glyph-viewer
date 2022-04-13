@@ -1,0 +1,107 @@
+#!/usr/bin/env python3
+import sys
+from typing import List, Tuple
+
+import fontconfig
+import freetype
+
+import PyQt5.QtWidgets as qt
+import PyQt5.QtGui as gui
+
+from glyph_finder import families_with_glyphs_for
+
+def specimen_for(sample: str, font_family: str) -> qt.QLabel:
+    """A QLabel drawing sample in font_family.
+
+    Asks for no fallbacks (not guaranteed), and uses default QT parameters for
+    everything else.
+
+    """
+
+    font = gui.QFont(font_family)
+    font.setStyleStrategy(gui.QFont.NoFontMerging)
+    specimen = qt.QLabel(sample)
+    specimen.setFont(font)
+    specimen.setBackgroundRole(gui.QPalette.Light)
+    return specimen
+
+
+def clipboard_button(string: str, app: qt.QApplication) -> qt.QPushButton:
+    """A button that, when pressed, copies the button text to the clipboard."""
+    button = qt.QPushButton(string)
+    button.clicked.connect(lambda: app.clipboard().setText(string))
+    return button
+
+
+def specimens_for(sample: str,
+                  font_families: List[str],
+                  app: qt.QApplication,
+                  ) -> List[Tuple[qt.QPushButton, qt.QLabel]]:
+    "Makes a list of (label, specimen) pairs for all the font families."
+    return [(clipboard_button(family, app=app), specimen_for(sample, family))
+             for family in font_families]
+
+
+def draw_specimens(app: qt.QApplication,
+                   grid: qt.QGridLayout,
+                   query: str) -> None:
+    """Draws in the grid all fonts that can write the query.
+
+Can be called multiple times to erase and redraw."""
+
+    while grid.count() > 0:
+        child = grid.takeAt(0)
+        if child and child.widget():
+            grid.removeWidget(child.widget())
+
+    current_line=0
+    maxwidth_label = 0
+    families = families_with_glyphs_for(query)
+
+    if not families:
+        grid.addWidget(qt.QLabel("No families found!"), 0, 0)
+    else:
+        specimens = specimens_for(query, families, app)
+        for label, specimen in specimens:
+            grid.addWidget(label, current_line, 0)
+            grid.addWidget(specimen, current_line, 1)
+            lwidth = label.width()
+            if lwidth > maxwidth_label:
+                maxwidth_label = lwidth
+            current_line += 1
+    grid.setColumnMinimumWidth(0, maxwidth_label)
+    grid.update()
+
+
+def run(initial_query: str) -> None:
+    """Set up the widgets, draw window and run app."""
+    app = qt.QApplication(sys.argv)
+    window = qt.QWidget()
+    layout = qt.QVBoxLayout()
+    exit_button = qt.QPushButton('Exit')
+    exit_button.clicked.connect(lambda: sys.exit(0))
+    query_field = qt.QLineEdit(initial_query)
+    scroll = qt.QScrollArea()
+    scroll.setWidgetResizable(True)
+    container = qt.QFrame()
+    grid = qt.QGridLayout(container)
+
+    grid.setColumnStretch(0, 1)
+    grid.setColumnStretch(1, 999)
+    scroll.setWidget(container)
+
+    query_field.returnPressed.connect(lambda: draw_specimens(app, grid, query_field.text()))
+    draw_specimens(app, grid, query_field.text())
+
+    layout.addWidget(query_field)
+    layout.addWidget(scroll)
+    layout.addWidget(exit_button)
+    window.setLayout(layout)
+    window.show()
+    app.exec()
+
+if __name__ == '__main__':
+    query = ''
+    if len(sys.argv) > 1:
+        query=sys.argv[1]
+    run(query)

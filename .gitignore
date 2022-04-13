@@ -1,0 +1,7 @@
+*.egg-info
+__pycache__
+bak
+build
+dist
+files.txt
+python_fontconfig
