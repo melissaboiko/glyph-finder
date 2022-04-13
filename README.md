@@ -2,9 +2,9 @@
 
 <img
   alt="screenshot of fonts being filtered"
-  src=screenshot1.png width=199 /><img
+  src=screenshot1.png width=333 /><img
   alt="further filtering"
-  src=screenshot2.png width=199 />
+  src=screenshot2.png width=333 />
 
 Due to font fallbacks, it can be hard to find or compare fonts that cover characters you’re interested in.  This is made worse by the way coverage tables often underpromise on actually having glyphs for all the characters.
 
