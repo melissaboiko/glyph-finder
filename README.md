@@ -42,7 +42,7 @@ Library usage:
 has_glyphs("/path/to/myfont.ttf", "ąǚæſ")
 # True if the font has glyphs for all the characters in query string.
 
-font_families = families_with_glyphs_for(""ąǚæſ")
+font_families = families_with_glyphs_for("ąǚæſ")
 # list of strings describing font families
 
 ```
