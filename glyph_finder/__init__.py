@@ -48,6 +48,4 @@ def families_with_glyphs_for(string: str) -> List[str]:
                              string)]
     families = [pat.get(fontconfig.PROP.FAMILY, 0)[0]
                 for pat in glyphed]
-    print(families)
-    print(sorted_unique(families))
     return sorted_unique(families)
